@@ -33,13 +33,13 @@ pip install -r requirements.txt
 
 In order to use GPU acceleration with CUDA on windows we need to compile llama.cpp with CUDA enabled:
 ```
-$Env:LLAMA_CUBLAS = "1"; \
-$Env:FORCE_CMAKE = "1"; \
-$Env:CMAKE_ARGS="-DLLAMA_CUBLAS=on"; \
-pip install --upgrade --force-reinstall --no-binary llama-cpp-python llama-cpp-python==0.1.62; \
-Remove-Item Env:\LLAMA_CUBLAS; \
-Remove-Item Env:\CMAKE_ARGS; \
-Remove-Item Env:\FORCE_CMAKE
+$Env:LLAMA_CUBLAS = "1"; 
+$Env:FORCE_CMAKE = "1"; 
+$Env:CMAKE_ARGS="-DLLAMA_CUBLAS=on"; 
+pip install --upgrade --force-reinstall --no-binary llama-cpp-python llama-cpp-python==0.1.62; 
+Remove-Item Env:\LLAMA_CUBLAS; 
+Remove-Item Env:\CMAKE_ARGS; 
+Remove-Item Env:\FORCE_CMAKE;
 ```
 If GPU acceleration enabled llama.cpp will output this lines when started:
 ```
