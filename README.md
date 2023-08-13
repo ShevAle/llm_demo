@@ -54,6 +54,48 @@ llama_model_load_internal: offloading k cache to GPU
 llama_model_load_internal: offloaded 35/35 layers to GPU
 ```
 
+In order to use GPU acceleration with OpenCL on windows for AMD gpu we need to compile llama.cpp with CLBlast enabled.
+
+- Get compiled CLBlast library from https://github.com/CNugteren/CLBlast/releases and extract it. `CLBlast_DIR` 
+environment variable should point to `lib\cmake\CLBlast` folder in extracted library.
+- Get vcpkg package manager, follow installation instruction from https://github.com/microsoft/vcpkg#quick-start-windows
+- Install opencl library `vcpkg install opencl:x64-windows`
+- Compile `llama-cpp-pythin` with CLBlast support: 
+```
+$Env:CLBlast_DIR = "D:\Projects\llm_demo\CLBlast-1.6.1-windows-x64\lib\cmake\CLBlast"; 
+$Env:FORCE_CMAKE = "1"; 
+$Env:CMAKE_ARGS="-DLLAMA_CLBLAST=on"; 
+pip install --upgrade --force-reinstall --no-binary llama-cpp-python llama-cpp-python==0.1.77; 
+Remove-Item Env:\CLBlast_DIR; 
+Remove-Item Env:\FORCE_CMAKE; 
+Remove-Item Env:\CMAKE_ARGS;
+```
+We need to load opencl and CLBlast libraries:
+```
+import ctypes
+
+ctypes.cdll.LoadLibrary("D:/Projects/llm_demo/CLBlast-1.6.1-windows-x64/lib/clblast.dll")
+ctypes.cdll.LoadLibrary("c:/vcpkg/packages/opencl_x64-windows/bin/OpenCL.dll")
+```
+If there are multiple gpus with opencl support, in our python file we can specify which platform and gpu to use:
+```
+import os
+os.environ["GGML_OPENCL_PLATFORM"] = "AMD"
+os.environ["GGML_OPENCL_DEVICE"] = "1"
+```
+If GPU acceleration with OpenCL enabled llama.cpp will output this lines when started:
+```
+ggml_opencl: selecting platform: 'AMD Accelerated Parallel Processing'
+ggml_opencl: selecting device: 'gfx1030'
+```
+```
+llama_model_load_internal: offloading 32 repeating layers to GPU
+llama_model_load_internal: offloading non-repeating layers to GPU
+llama_model_load_internal: offloading v cache to GPU
+llama_model_load_internal: offloading k cache to GPU
+llama_model_load_internal: offloaded 35/35 layers to GPU
+```
+
 # 1. Make sure model can run locally
 And can produce meaningful result:
 ```
